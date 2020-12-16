@@ -412,10 +412,10 @@ namespace CrosstabMerger
         }
 
         private bool WriteMergedFile(
-            IReadOnlyList<DatasetInfo> keyColumnHeaders,
+            IReadOnlyCollection<DatasetInfo> keyColumnHeaders,
             IReadOnlyList<DatasetInfo> mergedHeaders,
             SortedDictionary<string, SortedDictionary<string, DatasetValueContainer>> storedValues,
-            FileSystemInfo outputFile,
+            FileInfo outputFile,
             string delimiter)
         {
             try
@@ -423,6 +423,13 @@ namespace CrosstabMerger
                 var dataValues = new List<string>();
 
                 OnStatusEvent(string.Format("Creating the merged file at {0}", PRISM.PathUtils.CompactPathString(outputFile.FullName, 110)));
+
+                if (outputFile.Directory?.Exists == false)
+                {
+                    OnDebugEvent(string.Format("Creating missing directory {0}", PRISM.PathUtils.CompactPathString(outputFile.Directory.FullName, 110)));
+                    outputFile.Directory.Create();
+                    Console.WriteLine();
+                }
 
                 using (var writer = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
                 {
