@@ -187,7 +187,7 @@ namespace CrosstabMerger
                 if (outputFile.Exists && !Options.OverwriteExistingFile)
                 {
                     OnWarningEvent(string.Format("The output file already exists at {0}", outputFile.FullName));
-                    OnWarningEvent("To overwrite, start the program with /Y or use OverwriteExistingFile=True in a Key=Value parameter file");
+                    OnWarningEvent("To overwrite, start the program with /Y or use OverwriteExistingFile=True in a Key=Value parameter file (or use /Y:True)");
                     return false;
                 }
 

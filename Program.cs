@@ -22,9 +22,9 @@ namespace CrosstabMerger
     /// </remarks>
     internal static class Program
     {
-        // Ignore Spelling: crosstab, Conf, msec
+        // Ignore Spelling: crosstab, Conf, msec, quant
 
-        private const string PROGRAM_DATE = "2020-12-11";
+        private const string PROGRAM_DATE = "2020-12-15";
 
         private static DateTime mLastProgressTime;
 
@@ -43,7 +43,7 @@ namespace CrosstabMerger
 
             cmdLineParser.UsageExamples.Add("Program syntax:" + Environment.NewLine + Path.GetFileName(exePath) + "\n" +
                                             " /I:InputFilePathSpec [/O:OutputFileNameOrPath]\n" +
-                                            " [/D:OutputDirectory] [/Y]\n" +
+                                            " [/D:OutputDirectory] [/Y] [/Preview]\n" +
                                             " [/H:HeaderRowCount] [/K:KeyColumnCount]\n" +
                                             " [/Conf:KeyValueParamFilePath] [/CreateParamFile]");
 
