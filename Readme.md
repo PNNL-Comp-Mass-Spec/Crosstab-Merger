@@ -27,17 +27,17 @@ CrosstabMerger.exe
 ```
 
 Use `/I` to specify the pattern to use to find files to merge
-* The name must contain a wildcard character * so that multiple files can be found
-* For example, use `Block*.csv` to match all CSV files that start with "Block
-* Or, use `Block?_RelativeAbundanceRatios.csv` to match these four CSV files at https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs
-  * Block1_RelativeAbundanceRatios.csv"
-  * Block2_RelativeAbundanceRatios.csv"
-  * Block3_RelativeAbundanceRatios.csv"
-  * Block4_RelativeAbundanceRatios.csv"
+* The name must contain a wildcard character (either `*` or `?`) so that multiple files can be found
+* For example, use `Block*.csv` to match all CSV files that start with "Block"
+* Or, use `Block?_RelativeAbundanceRatios.csv` to match these four CSV files at [https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs)
+  * Block1_RelativeAbundanceRatios.csv
+  * Block2_RelativeAbundanceRatios.csv
+  * Block3_RelativeAbundanceRatios.csv
+  * Block4_RelativeAbundanceRatios.csv
 
 The output file name is optional, but can be specified using `/O`
 * For example, `/O:MergedAbundanceRatios.csv`
-* If omitted, the output file will be auto-named, based on the first input file name
+* If omitted, the output file will be auto-named, based on InputFilePathSpec
 
 Use `/D` to specify the output directory
 
@@ -45,16 +45,16 @@ Use `/Y` to allow overwriting an existing output file
 
 Use `/H` to specify the number of header rows
 * By default, the program assumes just one header row
-* For example, the PeptideQuantitation tab-delimited text files at https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs/ have one header row (and one key column)
-  * The RelativeAbundanceRatios CSV files at https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs/ have three header rows (and two key columns)
+* For example, the PeptideQuantitation tab-delimited text files on GitHub at [https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs) have one header row (and one key column)
+  * The RelativeAbundanceRatios CSV files [on GitHub](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs) have three header rows (and two key columns)
 
 Use `/K` to specify the number of key columns
 * This is the number of columns that provide metadata about the crosstab data
-  * If the crosstab has peptide quantitation values, and the data file lists protein name in the first column and peptide sequence in the second color, the file has two key columns
-* As mentioned for `/H`, the PeptideQuantitation .txt files [on GitHub](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs/) have one key column
+  * If the crosstab has peptide quantitation values, and the data file lists protein name in the first column and peptide sequence in the second column, the file has two key columns
+* As mentioned for `/H`, the PeptideQuantitation text files [on GitHub](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs/) have one key column
   * The RelativeAbundanceRatios CSV files [on GitHub](https://github.com/PNNL-Comp-Mass-Spec/Crosstab-Merger/tree/master/Docs/) have two key columns
 
-Use `/Preview` to read the input files and see the of datasets found and rows that would be written
+Use `/Preview` to read the input files and see the number of datasets found and rows that would be written
 
 Use `/P` or `/Conf` to define a key/value parameter file with settings to load
 * Example Key=Value parameter files
@@ -69,7 +69,7 @@ Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
 
 ## License
 
-MS File Info Scanner is licensed under the 2-Clause BSD License; you may not use this file 
+Crosstab Merger is licensed under the 2-Clause BSD License; you may not use this file 
 except in compliance with the License. You may obtain a copy of the License at 
 https://opensource.org/licenses/BSD-2-Clause
 
