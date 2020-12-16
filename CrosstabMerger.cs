@@ -226,6 +226,8 @@ namespace CrosstabMerger
                     {
                         var rowNumber = 0;
                         var headersRead = false;
+                        var duplicateKeyCount = 0;
+                        var fieldNameFirstInstance = new Dictionary<string, int>();
 
                         csv.Read();
                         csv.ReadHeader();
@@ -282,6 +284,29 @@ namespace CrosstabMerger
                                 secondaryFieldName += string.Format("\t{0}", csv.GetField<string>(columnIndex));
                             }
 
+                            var currentLineKey = keyColumnCount < 2 ? primaryFieldName : primaryFieldName + ", " + secondaryFieldName;
+                            if (fieldNameFirstInstance.TryGetValue(currentLineKey, out var rowNumFirstInstance))
+                            {
+                                duplicateKeyCount++;
+                                if (duplicateKeyCount <= 10 || duplicateKeyCount % 100 == 0)
+                                {
+                                    if (duplicateKeyCount == 1)
+                                    {
+                                        OnWarningEvent(string.Format(
+                                            "File {0} has a duplicate key on line {1}; in a crosstab, no two lines should have the same key columns",
+                                            inputFile.Name, rowNumber));
+                                    }
+
+                                    OnWarningEvent(string.Format(
+                                        "Skipped line {0} (duplicate of line {1}): {2}",
+                                        rowNumber, rowNumFirstInstance, currentLineKey));
+                                }
+
+                                continue;
+                            }
+
+                            fieldNameFirstInstance.Add(currentLineKey, rowNumber);
+
                             DatasetValueContainer valuesByDataset;
                             if (storedValues.TryGetValue(primaryFieldName, out var primaryField))
                             {
@@ -319,6 +344,14 @@ namespace CrosstabMerger
 
                         // Increment the column number add-on
                         columnNumberAddon += Options.KeyColumnCount + headers.Count;
+
+                        if (duplicateKeyCount > 10)
+                        {
+                            OnWarningEvent(string.Format(
+                                "Skipped {0} duplicate lines in {1}",
+                                duplicateKeyCount, inputFile.FullName));
+                            Console.WriteLine();
+                        }
                     }
                 }
 
