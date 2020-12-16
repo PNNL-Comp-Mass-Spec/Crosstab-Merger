@@ -448,8 +448,15 @@ namespace CrosstabMerger
                         foreach (var secondaryField in primaryField.Value)
                         {
                             dataValues.Add(primaryField.Key);
-                            var secondaryFieldParts = secondaryField.Key.Split('\t');
-                            dataValues.AddRange(secondaryFieldParts);
+                            if (keyColumnHeaders.Count == 2)
+                            {
+                                dataValues.Add(secondaryField.Key);
+                            }
+                            else if (keyColumnHeaders.Count > 2)
+                            {
+                                var secondaryFieldParts = secondaryField.Key.Split('\t');
+                                dataValues.AddRange(secondaryFieldParts);
+                            }
 
                             var datasetValues = secondaryField.Value.DatasetValues;
 
