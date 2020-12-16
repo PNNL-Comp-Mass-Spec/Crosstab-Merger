@@ -1,0 +1,24 @@
+# Required: Input file name or full path; the path should contain wildcard character * or ? to match multiple files
+# Either define this at the command line using /I or in a parameter file
+InputFilePathSpec=
+
+# Output file name or full path; if not provided, will be auto-defined based on the input file
+OutputFilePath=
+
+# Directory where the output file should be created
+OutputDirectoryPath=
+
+# Overwrite existing output file
+OverwriteExistingFile=True
+
+# Number of header rows
+HeaderRowCount=1
+
+# Number of key columns
+KeyColumnCount=1
+
+# Set to True to preview the dataset columns and number of merged result rows
+# Preview=False
+
+# Secondary arguments are shown above with their default value, but commented out using #
+# Enable and customize them by removing # from the start of the Key=Value line
