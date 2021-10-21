@@ -236,7 +236,8 @@ namespace CrosstabMerger
                         var headers = new Dictionary<int, DatasetInfo>();
 
                         var headerColumnIndex = 0;
-                        foreach (var header in csv.Parser.Context.HeaderRecord)
+
+                        foreach (var header in csv.Parser.Context.Reader.HeaderRecord)
                         {
                             var dataset = new DatasetInfo(headerColumnIndex + 1 + columnNumberAddon, header);
                             headers.Add(headerColumnIndex, dataset);
