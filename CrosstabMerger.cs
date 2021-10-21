@@ -221,138 +221,138 @@ namespace CrosstabMerger
                     }
 
                     OnStatusEvent("Reading data from " + PRISM.PathUtils.CompactPathString(inputFile.FullName, 110));
-                    using (var reader = new StreamReader(new FileStream(inputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
-                    using (var csv = new CsvHelper.CsvReader(reader, configuration))
+
+                    using var reader = new StreamReader(new FileStream(inputFile.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                    using var csv = new CsvHelper.CsvReader(reader, configuration);
+
+                    var rowNumber = 0;
+                    var headersRead = false;
+                    var duplicateKeyCount = 0;
+                    var fieldNameFirstInstance = new Dictionary<string, int>();
+
+                    csv.Read();
+                    csv.ReadHeader();
+                    rowNumber++;
+
+                    var headers = new Dictionary<int, DatasetInfo>();
+
+                    var headerColumnIndex = 0;
+
+                    foreach (var header in csv.Parser.Context.Reader.HeaderRecord)
                     {
-                        var rowNumber = 0;
-                        var headersRead = false;
-                        var duplicateKeyCount = 0;
-                        var fieldNameFirstInstance = new Dictionary<string, int>();
+                        var dataset = new DatasetInfo(headerColumnIndex + 1 + columnNumberAddon, header);
+                        headers.Add(headerColumnIndex, dataset);
 
-                        csv.Read();
-                        csv.ReadHeader();
-                        rowNumber++;
-
-                        var headers = new Dictionary<int, DatasetInfo>();
-
-                        var headerColumnIndex = 0;
-
-                        foreach (var header in csv.Parser.Context.Reader.HeaderRecord)
+                        if (columnNumberAddon == 0 && headerColumnIndex < Options.KeyColumnCount)
                         {
-                            var dataset = new DatasetInfo(headerColumnIndex + 1 + columnNumberAddon, header);
-                            headers.Add(headerColumnIndex, dataset);
-
-                            if (columnNumberAddon == 0 && headerColumnIndex < Options.KeyColumnCount)
-                            {
-                                // This is the first file; cache the key column headers
-                                keyColumnHeaders.Add(dataset);
-                            }
-
-                            headerColumnIndex++;
+                            // This is the first file; cache the key column headers
+                            keyColumnHeaders.Add(dataset);
                         }
 
-                        if (Options.HeaderRowCount <= 1)
-                            headersRead = true;
+                        headerColumnIndex++;
+                    }
 
-                        var keyColumnCount = Options.KeyColumnCount;
-                        var headerCount = headers.Count;
+                    if (Options.HeaderRowCount <= 1)
+                        headersRead = true;
 
-                        while (csv.Read())
+                    var keyColumnCount = Options.KeyColumnCount;
+                    var headerCount = headers.Count;
+
+                    while (csv.Read())
+                    {
+                        rowNumber++;
+
+                        if (!headersRead)
                         {
-                            rowNumber++;
-
-                            if (!headersRead)
-                            {
-                                for (var columnIndex = 0; columnIndex < headerCount; columnIndex++)
-                                {
-                                    if (!csv.TryGetField<string>(columnIndex, out var fieldValue))
-                                        continue;
-
-                                    headers[columnIndex].HeaderNames.Add(fieldValue);
-                                }
-
-                                if (Options.HeaderRowCount == rowNumber)
-                                    headersRead = true;
-
-                                continue;
-                            }
-
-                            var primaryFieldName = csv.GetField<string>(0);
-                            var secondaryFieldName = keyColumnCount < 2 ? string.Empty : csv.GetField<string>(1);
-
-                            for (var columnIndex = 2; columnIndex < keyColumnCount; columnIndex++)
-                            {
-                                secondaryFieldName += string.Format("\t{0}", csv.GetField<string>(columnIndex));
-                            }
-
-                            var currentLineKey = keyColumnCount < 2 ? primaryFieldName : primaryFieldName + ", " + secondaryFieldName;
-                            if (fieldNameFirstInstance.TryGetValue(currentLineKey, out var rowNumFirstInstance))
-                            {
-                                duplicateKeyCount++;
-                                if (duplicateKeyCount <= 10 || duplicateKeyCount % 100 == 0)
-                                {
-                                    if (duplicateKeyCount == 1)
-                                    {
-                                        OnWarningEvent(string.Format(
-                                            "File {0} has a duplicate key on line {1}; in a crosstab, no two lines should have the same key columns",
-                                            inputFile.Name, rowNumber));
-                                    }
-
-                                    OnWarningEvent(string.Format(
-                                        "Skipped line {0} (duplicate of line {1}): {2}",
-                                        rowNumber, rowNumFirstInstance, currentLineKey));
-                                }
-
-                                continue;
-                            }
-
-                            fieldNameFirstInstance.Add(currentLineKey, rowNumber);
-
-                            DatasetValueContainer valuesByDataset;
-                            if (storedValues.TryGetValue(primaryFieldName, out var primaryField))
-                            {
-                                if (!primaryField.TryGetValue(secondaryFieldName, out valuesByDataset))
-                                {
-                                    valuesByDataset = new DatasetValueContainer();
-                                    primaryField.Add(secondaryFieldName, valuesByDataset);
-                                }
-                            }
-                            else
-                            {
-                                valuesByDataset = new DatasetValueContainer();
-                                primaryField = new SortedDictionary<string, DatasetValueContainer>
-                                {
-                                    { secondaryFieldName, valuesByDataset }
-                                };
-                                storedValues.Add(primaryFieldName, primaryField);
-                            }
-
-                            for (var columnIndex = keyColumnCount; columnIndex < headerCount; columnIndex++)
+                            for (var columnIndex = 0; columnIndex < headerCount; columnIndex++)
                             {
                                 if (!csv.TryGetField<string>(columnIndex, out var fieldValue))
                                     continue;
 
-                                var currentDataset = headers[columnIndex];
-                                valuesByDataset.DatasetValues.Add(currentDataset, fieldValue);
+                                headers[columnIndex].HeaderNames.Add(fieldValue);
+                            }
+
+                            if (Options.HeaderRowCount == rowNumber)
+                                headersRead = true;
+
+                            continue;
+                        }
+
+                        var primaryFieldName = csv.GetField<string>(0);
+                        var secondaryFieldName = keyColumnCount < 2 ? string.Empty : csv.GetField<string>(1);
+
+                        for (var columnIndex = 2; columnIndex < keyColumnCount; columnIndex++)
+                        {
+                            secondaryFieldName += string.Format("\t{0}", csv.GetField<string>(columnIndex));
+                        }
+
+                        var currentLineKey = keyColumnCount < 2 ? primaryFieldName : primaryFieldName + ", " + secondaryFieldName;
+                        if (fieldNameFirstInstance.TryGetValue(currentLineKey, out var rowNumFirstInstance))
+                        {
+                            duplicateKeyCount++;
+                            if (duplicateKeyCount <= 10 || duplicateKeyCount % 100 == 0)
+                            {
+                                if (duplicateKeyCount == 1)
+                                {
+                                    OnWarningEvent(string.Format(
+                                        "File {0} has a duplicate key on line {1}; in a crosstab, no two lines should have the same key columns",
+                                        inputFile.Name, rowNumber));
+                                }
+
+                                OnWarningEvent(string.Format(
+                                    "Skipped line {0} (duplicate of line {1}): {2}",
+                                    rowNumber, rowNumFirstInstance, currentLineKey));
+                            }
+
+                            continue;
+                        }
+
+                        fieldNameFirstInstance.Add(currentLineKey, rowNumber);
+
+                        DatasetValueContainer valuesByDataset;
+                        if (storedValues.TryGetValue(primaryFieldName, out var primaryField))
+                        {
+                            if (!primaryField.TryGetValue(secondaryFieldName, out valuesByDataset))
+                            {
+                                valuesByDataset = new DatasetValueContainer();
+                                primaryField.Add(secondaryFieldName, valuesByDataset);
                             }
                         }
-
-                        // Append headers to the merged header list
-                        foreach (var header in from item in headers.Skip(keyColumnCount) orderby item.Key select item.Value)
+                        else
                         {
-                            mergedHeaders.Add(header);
+                            valuesByDataset = new DatasetValueContainer();
+                            primaryField = new SortedDictionary<string, DatasetValueContainer>
+                                {
+                                    { secondaryFieldName, valuesByDataset }
+                                };
+                            storedValues.Add(primaryFieldName, primaryField);
                         }
 
-                        // Increment the column number add-on
-                        columnNumberAddon += Options.KeyColumnCount + headers.Count;
-
-                        if (duplicateKeyCount > 10)
+                        for (var columnIndex = keyColumnCount; columnIndex < headerCount; columnIndex++)
                         {
-                            OnWarningEvent(string.Format(
-                                "Skipped {0} duplicate lines in {1}",
-                                duplicateKeyCount, inputFile.FullName));
-                            Console.WriteLine();
+                            if (!csv.TryGetField<string>(columnIndex, out var fieldValue))
+                                continue;
+
+                            var currentDataset = headers[columnIndex];
+                            valuesByDataset.DatasetValues.Add(currentDataset, fieldValue);
                         }
+                    }
+
+                    // Append headers to the merged header list
+                    foreach (var header in from item in headers.Skip(keyColumnCount) orderby item.Key select item.Value)
+                    {
+                        mergedHeaders.Add(header);
+                    }
+
+                    // Increment the column number add-on
+                    columnNumberAddon += Options.KeyColumnCount + headers.Count;
+
+                    if (duplicateKeyCount > 10)
+                    {
+                        OnWarningEvent(string.Format(
+                            "Skipped {0} duplicate lines in {1}",
+                            duplicateKeyCount, inputFile.FullName));
+                        Console.WriteLine();
                     }
                 }
 
@@ -432,56 +432,55 @@ namespace CrosstabMerger
                     Console.WriteLine();
                 }
 
-                using (var writer = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read)))
+                using var writer = new StreamWriter(new FileStream(outputFile.FullName, FileMode.Create, FileAccess.Write, FileShare.Read));
+
+                // Write the header row(s)
+                for (var rowIndex = 0; rowIndex < Options.HeaderRowCount; rowIndex++)
                 {
-                    // Write the header row(s)
-                    for (var rowIndex = 0; rowIndex < Options.HeaderRowCount; rowIndex++)
+                    foreach (var keyColumn in keyColumnHeaders)
                     {
-                        foreach (var keyColumn in keyColumnHeaders)
-                        {
-                            dataValues.Add(keyColumn.HeaderNames[rowIndex]);
-                        }
-
-                        foreach (var header in mergedHeaders)
-                        {
-                            dataValues.Add(header.HeaderNames[rowIndex]);
-                        }
-
-                        writer.WriteLine(string.Join(delimiter, dataValues));
-                        dataValues.Clear();
+                        dataValues.Add(keyColumn.HeaderNames[rowIndex]);
                     }
 
-                    foreach (var primaryField in storedValues)
+                    foreach (var header in mergedHeaders)
                     {
-                        foreach (var secondaryField in primaryField.Value)
+                        dataValues.Add(header.HeaderNames[rowIndex]);
+                    }
+
+                    writer.WriteLine(string.Join(delimiter, dataValues));
+                    dataValues.Clear();
+                }
+
+                foreach (var primaryField in storedValues)
+                {
+                    foreach (var secondaryField in primaryField.Value)
+                    {
+                        dataValues.Add(primaryField.Key);
+                        if (keyColumnHeaders.Count == 2)
                         {
-                            dataValues.Add(primaryField.Key);
-                            if (keyColumnHeaders.Count == 2)
-                            {
-                                dataValues.Add(secondaryField.Key);
-                            }
-                            else if (keyColumnHeaders.Count > 2)
-                            {
-                                var secondaryFieldParts = secondaryField.Key.Split('\t');
-                                dataValues.AddRange(secondaryFieldParts);
-                            }
-
-                            var datasetValues = secondaryField.Value.DatasetValues;
-
-                            foreach (var datasetInfo in mergedHeaders)
-                            {
-                                if (datasetValues.TryGetValue(datasetInfo, out var value))
-                                {
-                                    dataValues.Add(value);
-                                }
-                                else
-                                {
-                                    dataValues.Add(string.Empty);
-                                }
-                            }
-                            writer.WriteLine(string.Join(delimiter, dataValues));
-                            dataValues.Clear();
+                            dataValues.Add(secondaryField.Key);
                         }
+                        else if (keyColumnHeaders.Count > 2)
+                        {
+                            var secondaryFieldParts = secondaryField.Key.Split('\t');
+                            dataValues.AddRange(secondaryFieldParts);
+                        }
+
+                        var datasetValues = secondaryField.Value.DatasetValues;
+
+                        foreach (var datasetInfo in mergedHeaders)
+                        {
+                            if (datasetValues.TryGetValue(datasetInfo, out var value))
+                            {
+                                dataValues.Add(value);
+                            }
+                            else
+                            {
+                                dataValues.Add(string.Empty);
+                            }
+                        }
+                        writer.WriteLine(string.Join(delimiter, dataValues));
+                        dataValues.Clear();
                     }
                 }
 
