@@ -17,14 +17,14 @@ namespace CrosstabMerger
     /// </para>
     /// <para>
     /// E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-    /// Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/
+    /// Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics
     /// </para>
     /// </remarks>
     internal static class Program
     {
         // Ignore Spelling: crosstab, Conf, msec, quant
 
-        private const string PROGRAM_DATE = "2020-12-15";
+        private const string PROGRAM_DATE = "2021-10-21";
 
         private static DateTime mLastProgressTime;
 
@@ -38,7 +38,7 @@ namespace CrosstabMerger
                               "It creates a single merged crosstab file",
                 ContactInfo = "Program written by Matthew Monroe for PNNL (Richland, WA) in 2020" + Environment.NewLine +
                               "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
-                              "Website: https://omics.pnl.gov/ or https://panomics.pnnl.gov/"
+                              "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics"
             };
 
             cmdLineParser.UsageExamples.Add("Program syntax:" + Environment.NewLine + Path.GetFileName(exePath) + "\n" +
