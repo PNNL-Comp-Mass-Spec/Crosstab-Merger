@@ -24,7 +24,7 @@ namespace CrosstabMerger
     {
         // Ignore Spelling: crosstab, Conf, msec, quant
 
-        private const string PROGRAM_DATE = "2021-10-21";
+        private const string PROGRAM_DATE = "2021-11-11";
 
         private static DateTime mLastProgressTime;
 
@@ -32,32 +32,39 @@ namespace CrosstabMerger
         {
             var exeName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
             var exePath = PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppPath();
-            var cmdLineParser = new CommandLineParser<CrosstabMergerOptions>(exeName, GetAppVersion())
+
+            var parser = new CommandLineParser<CrosstabMergerOptions>(exeName, GetAppVersion())
             {
                 ProgramInfo = "This program merges crosstab files (aka PivotTables) that have a similar format.\n" +
                               "It creates a single merged crosstab file",
-                ContactInfo = "Program written by Matthew Monroe for PNNL (Richland, WA) in 2020" + Environment.NewLine +
+                ContactInfo = "Program written by Matthew Monroe for PNNL (Richland, WA)" + Environment.NewLine +
                               "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
                               "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics"
             };
 
-            cmdLineParser.UsageExamples.Add("Program syntax:" + Environment.NewLine + Path.GetFileName(exePath) + "\n" +
+            parser.UsageExamples.Add("Program syntax:" + Environment.NewLine + Path.GetFileName(exePath) + "\n" +
                                             " /I:InputFilePathSpec [/O:OutputFileNameOrPath]\n" +
                                             " [/D:OutputDirectory] [/Y] [/Preview]\n" +
                                             " [/H:HeaderRowCount] [/K:KeyColumnCount]\n" +
                                             " [/Conf:KeyValueParamFilePath] [/CreateParamFile]");
 
-            cmdLineParser.UsageExamples.Add(string.Format("{0} QuantResults*.tsv /O:MergedResults /H:1 /K:2", Path.GetFileName(exePath)));
+            parser.UsageExamples.Add(string.Format("{0} QuantResults*.tsv /O:MergedResults /H:1 /K:2", Path.GetFileName(exePath)));
 
             // The default argument name for parameter files is /ParamFile or -ParamFile
             // Also allow /Conf or /P
-            cmdLineParser.AddParamFileKey("Conf");
-            cmdLineParser.AddParamFileKey("P");
+            parser.AddParamFileKey("Conf");
+            parser.AddParamFileKey("P");
 
-            var result = cmdLineParser.ParseArgs(args);
+            var result = parser.ParseArgs(args);
             var options = result.ParsedResults;
+
             if (!result.Success || !options.Validate())
             {
+                if (parser.CreateParamFileProvided)
+                {
+                    return 0;
+                }
+
                 // Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
                 System.Threading.Thread.Sleep(750);
                 return -1;
