@@ -17,7 +17,7 @@ namespace CrosstabMerger
     /// </para>
     /// <para>
     /// E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov
-    /// Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics
+    /// Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://www.pnnl.gov/integrative-omics
     /// </para>
     /// </remarks>
     internal static class Program
@@ -39,7 +39,7 @@ namespace CrosstabMerger
                               "It creates a single merged crosstab file",
                 ContactInfo = "Program written by Matthew Monroe for PNNL (Richland, WA)" + Environment.NewLine +
                               "E-mail: matthew.monroe@pnnl.gov or proteomics@pnnl.gov" + Environment.NewLine +
-                              "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://panomics.pnnl.gov/ or https://www.pnnl.gov/integrative-omics"
+                              "Website: https://github.com/PNNL-Comp-Mass-Spec/ or https://www.pnnl.gov/integrative-omics"
             };
 
             parser.UsageExamples.Add("Program syntax:" + Environment.NewLine + Path.GetFileName(exePath) + "\n" +
@@ -65,7 +65,7 @@ namespace CrosstabMerger
                     return 0;
                 }
 
-                // Delay for 750 msec in case the user double clicked this file from within Windows Explorer (or started the program via a shortcut)
+                // Delay for 750 msec in case the user double-clicked this file from within Windows Explorer (or started the program via a shortcut)
                 System.Threading.Thread.Sleep(750);
                 return -1;
             }
