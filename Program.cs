@@ -24,14 +24,14 @@ namespace CrosstabMerger
     {
         // Ignore Spelling: crosstab, Conf, msec, quant
 
-        private const string PROGRAM_DATE = "2021-11-11";
+        private const string PROGRAM_DATE = "July 2, 2026";
 
         private static DateTime mLastProgressTime;
 
         private static int Main(string[] args)
         {
             var exeName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
-            var exePath = PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppPath();
+            var exePath = PRISM.AppUtils.GetAppPath();
 
             var parser = new CommandLineParser<CrosstabMergerOptions>(exeName, GetAppVersion())
             {
@@ -104,7 +104,7 @@ namespace CrosstabMerger
 
         private static string GetAppVersion()
         {
-            return PRISM.FileProcessor.ProcessFilesOrDirectoriesBase.GetAppVersion(PROGRAM_DATE);
+            return PRISM.AppUtils.GetAppVersion(PROGRAM_DATE);
         }
 
         private static void ShowErrorMessage(string message, Exception ex = null)
