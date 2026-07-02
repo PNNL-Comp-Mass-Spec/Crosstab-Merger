@@ -4,7 +4,7 @@ namespace CrosstabMerger
 {
     public class CrosstabMergerOptions
     {
-        // Ignore Spelling: wildcards, wildcard
+        // Ignore Spelling: crosstab, wildcards, wildcard
 
         /// <summary>
         /// Input file name and/or full path

@@ -4,6 +4,8 @@ namespace CrosstabMerger
 {
     internal class DatasetInfo
     {
+        // Ignore Spelling: crosstab
+
         public int ColumnNumber { get; }
 
         /// <summary>

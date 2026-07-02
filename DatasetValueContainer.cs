@@ -4,6 +4,8 @@ namespace CrosstabMerger
 {
     internal class DatasetValueContainer
     {
+        // Ignore Spelling: crosstab
+
         public Dictionary<DatasetInfo, string> DatasetValues { get; }
 
         /// <summary>
